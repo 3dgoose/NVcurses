@@ -16,12 +16,7 @@ int main(void) {
     double used = 4.5;
     double total = 8.0;
 
-    // Print initial data
-    printf("Temp: %d C\n", temp);
-    printf("Power: %d W\n", power);
-    printf("GPU Clock: %d MHz\n", clock);
-    printf("Fan: %d %%\n", fan);
-    printf("Memory: %.2f / %.2f GB\n", used, total);
+    // Use ACS Unicode characters
 
     while(1) {
         // get data with nvml
