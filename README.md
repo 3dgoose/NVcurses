@@ -1,8 +1,8 @@
-# iloveNV
+# nvfetch 
 
-View your NVIDIA GPU's info on Linux.
+View your NVIDIA GPU information on Linux and right from your terminal.
 
-## Information
+## Fetch
 
 * [x] Power consumption
 * [x] Model
@@ -17,3 +17,21 @@ View your NVIDIA GPU's info on Linux.
 * [ ] More PCIe info
 * [ ] GPU Usage
 * [ ] Process usage
+
+## Install
+
+Install it from the AUR :
+```bash
+yay -S nvfetch
+```
+
+Compile it yourself : 
+```bash
+make
+```
+
+
+## Why
+
+Because most GPU fetches on Linux suck. Also, I wanted to try NVML. Cool!
+
