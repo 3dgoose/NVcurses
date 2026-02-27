@@ -1,4 +1,4 @@
-# nvfetch 
+# nvcare
 
 View your NVIDIA GPU information on Linux and right from your terminal.
 
@@ -22,7 +22,7 @@ View your NVIDIA GPU information on Linux and right from your terminal.
 
 Install it from the AUR :
 ```bash
-yay -S nvfetch
+yay -S nvcare
 ```
 
 Compile it yourself : 
