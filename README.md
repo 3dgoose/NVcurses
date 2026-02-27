@@ -13,3 +13,7 @@ View your NVIDIA GPU's info on Linux.
 * [x] Drivers version
 * [x] Fan
 * [x] Temperature
+* [ ] Throttle reason
+* [ ] More PCIe info
+* [ ] GPU Usage
+* [ ] Process usage
