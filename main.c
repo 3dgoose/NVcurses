@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <curses.h>
-
 #include "/opt/cuda/include/nvml.h"
+
+#include <unistd.h>
+#include <ncurses.h>
 
 typedef struct {
     unsigned int code;
@@ -28,21 +28,11 @@ const char* getArchName(unsigned int code) {
     return "Invalid";
 }
 
-void initUI(void) {
-	initscr();
-	noecho();
-	cbreak();
-	nodelay(stdscr, TRUE);
-	keypad(stdscr, TRUE);
-}
-
-void drawUI(void) {
-	
-}
-
 int main(void) {
-	
-	initUI();
+	initscr();
+	cbreak();
+	noecho();
+	nodelay(stdscr, TRUE);
 
 	nvmlDevice_t dev;
 
@@ -75,7 +65,7 @@ int main(void) {
 	nvmlReturn_t clockResult = nvmlDeviceGetClock(dev, NVML_CLOCK_SM, NVML_CLOCK_ID_CURRENT, &clockMhz);
 	nvmlReturn_t fanResult = nvmlDeviceGetFanSpeed(dev, &fanSpeed);
 	nvmlReturn_t boardResult = nvmlDeviceGetBoardId(dev, &boardId);
-	nvmlReturn_t pcieGenResult = nvmlDeviceGetCurrPcieLinkGeneration(dev, &pcieGen);
+	
 	nvmlReturn_t maxGenResult = nvmlDeviceGetMaxPcieLinkGeneration(dev, &maxGen);
 	nvmlReturn_t pathResult = nvmlDeviceGetMinorNumber(dev, &pathNum);
 
@@ -89,8 +79,6 @@ int main(void) {
 	nvmlReturn_t memResult = nvmlDeviceGetMemoryInfo(dev, &memInfo);
 	nvmlReturn_t archResult = nvmlDeviceGetArchitecture(dev, &arch);
 
-	nvmlReturn_t setSpeed = nvmlDeviceSetFanSpeed_v2(dev, 0, 90); 
-	
 	if(initResult != NVML_SUCCESS) printf("Failed to init NVML.\n");
 	if(handleResult != NVML_SUCCESS) printf("Failed to get GPU handle.\n");
 	
@@ -100,30 +88,50 @@ int main(void) {
     	printf("Power: %d W\n", pwr / 1000);
 	} 
 	
-	if(setSpeed != NVML_SUCCESS) {
-		printf("Failed to set fan speed : %s\n", nvmlErrorString(setSpeed));
+	double used = memInfo.used / (double)(1ULL << 30);
+	double total = memInfo.total / (double)(1ULL << 30);
+
+	while (1) {
+
+		int ch = getch();
+		if (ch == 'q' || ch == 'Q')
+			break;
+
+		nvmlDeviceGetPowerUsage(dev, &pwr);
+		nvmlDeviceGetTemperature(dev, NVML_TEMPERATURE_GPU, &temp);
+		nvmlDeviceGetClock(dev, NVML_CLOCK_SM, NVML_CLOCK_ID_CURRENT, &clockMhz);
+		nvmlReturn_t pcieGenResult = nvmlDeviceGetCurrPcieLinkGeneration(dev, &pcieGen);
+		nvmlDeviceGetFanSpeed(dev, &fanSpeed);
+		nvmlDeviceGetMemoryInfo(dev, &memInfo);	
+
+		double used = memInfo.used / (double)(1ULL << 30);
+		double total = memInfo.total / (double)(1ULL << 30);
+
+		clear();
+
+		printw("Temp: %d°C\n", temp);
+		printw("GPU Clock : %u Mhz\n", clockMhz);
+		printw("GPU fan speed : %u %%\n", fanSpeed);
+		printw("GPU Board ID: %u\n", boardId);
+		printw("vBIOS version : %s\n", vbios);
+		printw("GPU : %s\n", model);
+		printw("PCIe Link generation : %u\n", pcieGen);
+		printw("PCIe Max Link gen : %u\n", maxGen);
+		printw("Memory : %.3f / %.3f GiB\n", used, total);
+		printw("Device file path: /dev/nvidia%u\n", pathNum);
+		printw("GPU arch : %s\n", getArchName(arch));
+		
+		printw("CUDA Driver Version: %d\n", cuda / 1000);
+		printw("NVIDIA Driver Version: %s\n", driver);
+		printw("NVML Version: %s\n", nvml);
+
+		printw("\nPress Q to quit\n");
+
+		refresh();
+
+		sleep(5);
 	}
-
-	double used = memInfo.used / 1e9;
-	double total = memInfo.total / 1e9;
 	
-	nvmlDeviceSetFanSpeed_v2(dev, 1, 90);
-
-	printf("Temp: %d°C\n", temp);
-	printf("GPU Clock : %u Mhz\n", clockMhz);
-	printf("GPU fan speed : %u %%\n", fanSpeed);
-	printf("GPU Board ID: %u\n", boardId);
-	printf("vBIOS version : %s\n", vbios);
-	printf("GPU : %s\n", model);
-	printf("PCIe Link generation : %u\n", pcieGen);
-	printf("PCIe Max Link gen : %u\n", maxGen);
-	printf("Memory : %.3f / %.3f GB\n", used, total);
-	printf("Device file path: /dev/nvidia%u\n", pathNum);
-	printf("GPU arch : %s\n", getArchName(arch));
-	
-	printf("CUDA Driver Version: %d\n", cuda / 1000);
-	printf("NVIDIA Driver Version: %s\n", driver);
-	printf("NVML Version: %s\n", nvml);
-
+	endwin();
 	nvmlShutdown();
 }

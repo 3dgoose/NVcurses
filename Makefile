@@ -1,5 +1,5 @@
-CC = tcc
+CC = gcc # Change to tcc for lighter binaries
+CFLAGS = -std=c99 -lnvidia-ml -lncurses
 
 all:
-	$(CC) main.c -lnvidia-ml -o nvcurses
-	$(CC) test.c -lncurses -o test
+	$(CC) main.c $(CFLAGS) -o nvcare
