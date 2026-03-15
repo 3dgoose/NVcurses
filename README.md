@@ -2,6 +2,8 @@
 
 View your NVIDIA GPU information on Linux and right from your terminal.
 
+![Made with VHS](https://vhs.charm.sh/vhs-2Vy2eWZIxw4Z2fpMgXyuIP.gif)
+
 ## Fetch
 
 * [x] Power consumption
@@ -29,7 +31,6 @@ Compile it yourself :
 ```bash
 make
 ```
-
 
 ## Why
 
